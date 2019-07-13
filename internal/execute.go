@@ -31,14 +31,14 @@ func Execute(in io.Reader, out, errw io.Writer, args []string) error {
 	cmd.Stderr = errw
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("Запуск программы завершился с ошибкой: %v", err)
+		return fmt.Errorf("запуск программы завершился с ошибкой: %v", err)
 	}
 
 	return nil
 }
 
 func env(path string, files []os.FileInfo) []string {
-	var env []string
+	env := make([]string, 0, len(files))
 
 	for _, file := range files {
 		if file.IsDir() {

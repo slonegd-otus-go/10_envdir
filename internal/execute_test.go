@@ -44,7 +44,7 @@ func TestExecute(t *testing.T) {
 			name:    "dont exist prog",
 			in:      strings.NewReader(""),
 			args:    []string{"./test", "envenv"},
-			wantErr: "Запуск программы завершился с ошибкой: exec: \"envenv\": executable file not found in $PATH",
+			wantErr: "запуск программы завершился с ошибкой: exec: \"envenv\": executable file not found in $PATH",
 		},
 		{
 			name:    "wrong args",
@@ -54,6 +54,7 @@ func TestExecute(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		//nolint:scopelint
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
 			errw := &bytes.Buffer{}
