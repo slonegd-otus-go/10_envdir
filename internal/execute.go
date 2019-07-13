@@ -1,39 +1,43 @@
 package internal
 
 import (
-	"io/ioutil"
-	"log"
+	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 )
 
-func Execute(in io.Reader, out, errw io.Writer, args []string){
-	if len(args) != 3 {
-		log.Fatal("должно быть 2 аргумента: путь до каталога и имя программы")
+func Execute(in io.Reader, out, errw io.Writer, args []string) error {
+	if len(args) != 2 {
+		return errors.New("должно быть 2 аргумента: путь до каталога и имя программы")
 	}
 
-	path := args[1]
-	progname := args[2]
+	path := args[0]
+	progname := args[1]
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return err
+	}
 
 	cmd := exec.Command(progname)
-	cmd.Env = env(path)
+	cmd.Env = env(path, files)
 	cmd.Stdin = in
 	cmd.Stdout = out
 	cmd.Stderr = errw
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
-		log.Fatalf("Запуск программы завершился с ошибкой: %v", err)
+		return fmt.Errorf("Запуск программы завершился с ошибкой: %v", err)
 	}
+
+	return nil
 }
 
-func env(path string) []string {
-	files, err := ioutil.ReadDir(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func env(path string, files []os.FileInfo) []string {
 	var env []string
 
 	for _, file := range files {
